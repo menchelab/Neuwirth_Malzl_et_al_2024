@@ -1,0 +1,8 @@
+sample_id,molecule_h5,Status,Tissue
+SSHIV35_1,/groups/pavri/bioinfo/daniel/scStary/SSHIV35_1/outs/molecule_info.h5,healthy,unkown
+SSHIV35_2,/groups/pavri/bioinfo/daniel/scStary/SSHIV35_2/outs/molecule_info.h5,healthy,unkown
+SSHIV35_3,/groups/pavri/bioinfo/daniel/scStary/SSHIV35_3/outs/molecule_info.h5,healthy,unkown
+SSHIV35_4,/groups/pavri/bioinfo/daniel/scStary/SSHIV35_4/outs/molecule_info.h5,healthy,unkown
+SSHIV35_5,/groups/pavri/bioinfo/daniel/scStary/SSHIV35_5/outs/molecule_info.h5,healthy,unkown
+SSHIV35_6,/groups/pavri/bioinfo/daniel/scStary/SSHIV35_6/outs/molecule_info.h5,healthy,unkown
+SSHIV35_7,/groups/pavri/bioinfo/daniel/scStary/SSHIV35_7/outs/molecule_info.h5,healthy,unkown

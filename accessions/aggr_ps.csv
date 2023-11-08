@@ -1,0 +1,97 @@
+sample_id,molecule_h5,patient_id,Status,Tissue,Cell_fraction
+4820STDY7388991,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7388991/outs/molecule_info.h5,s1,normal,dermis,fibroblasts
+4820STDY7388992,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7388992/outs/molecule_info.h5,s1,normal,dermis,dermal lymphoid
+4820STDY7388993,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7388993/outs/molecule_info.h5,s1,normal,dermis,endothelium
+4820STDY7388994,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7388994/outs/molecule_info.h5,s1,normal,dermis,dermal myeloid
+4820STDY7388995,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7388995/outs/molecule_info.h5,s1,normal,epidermis,epidermal myeloid
+4820STDY7388996,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7388996/outs/molecule_info.h5,s1,normal,epidermis,keratinocytes CD49f-
+4820STDY7388997,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7388997/outs/molecule_info.h5,s1,normal,epidermis,keratinocytes CD49f+
+4820STDY7388998,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7388998/outs/molecule_info.h5,s1,normal,epidermis,epidermal lymphoid
+4820STDY7388999,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7388999/outs/molecule_info.h5,s2,normal,dermis,fibroblasts
+4820STDY7389000,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7389000/outs/molecule_info.h5,s2,normal,dermis,dermal lymphoid
+4820STDY7389001,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7389001/outs/molecule_info.h5,s2,normal,dermis,endothelium
+4820STDY7389002,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7389002/outs/molecule_info.h5,s2,normal,dermis,dermal myeloid
+4820STDY7389003,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7389003/outs/molecule_info.h5,s2,normal,epidermis,epidermal myeloid
+4820STDY7389004,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7389004/outs/molecule_info.h5,s2,normal,epidermis,keratinocytes CD49f-
+4820STDY7389005,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7389005/outs/molecule_info.h5,s2,normal,epidermis,keratinocytes CD49f+
+4820STDY7389006,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7389006/outs/molecule_info.h5,s2,normal,epidermis,epidermal lymphoid
+4820STDY7389007,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7389007/outs/molecule_info.h5,s3,normal,dermis,fibroblasts
+4820STDY7389008,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7389008/outs/molecule_info.h5,s3,normal,dermis,dermal lymphoid
+4820STDY7389009,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7389009/outs/molecule_info.h5,s3,normal,dermis,endothelium
+4820STDY7389010,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7389010/outs/molecule_info.h5,s3,normal,dermis,dermal myeloid
+4820STDY7389011,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7389011/outs/molecule_info.h5,s3,normal,epidermis,epidermal myeloid
+4820STDY7389012,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7389012/outs/molecule_info.h5,s3,normal,epidermis,keratinocytes CD49f-
+4820STDY7389013,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7389013/outs/molecule_info.h5,s3,normal,epidermis,keratinocytes CD49f+
+4820STDY7389014,/scratch-cbe/users/daniel.malzl/scanalysis/4820STDY7389014/outs/molecule_info.h5,s3,normal,epidermis,epidermal lymphoid
+SKN8090524,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090524/outs/molecule_info.h5,E2,atopic eczema,epidermis,live single spike
+SKN8090525,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090525/outs/molecule_info.h5,E2,atopic eczema,epidermis,CD45-
+SKN8090526,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090526/outs/molecule_info.h5,E2,atopic eczema,dermis,live single spike
+SKN8090527,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090527/outs/molecule_info.h5,E2,atopic eczema,dermis,CD45-
+SKN8090528,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090528/outs/molecule_info.h5,E2,atopic eczema,epidermis,CD45+
+SKN8090529,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090529/outs/molecule_info.h5,E2,atopic eczema,epidermis,CD45-
+SKN8090530,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090530/outs/molecule_info.h5,E2,atopic eczema,dermis,CD45+
+SKN8090531,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090531/outs/molecule_info.h5,E2,atopic eczema,dermis,CD45-
+SKN8090536,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090536/outs/molecule_info.h5,E3,atopic eczema,dermis,CD45+
+SKN8090537,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090537/outs/molecule_info.h5,E3,atopic eczema,dermis,CD45-
+SKN8090538,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090538/outs/molecule_info.h5,E3,atopic eczema,epidermis,CD45+
+SKN8090539,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090539/outs/molecule_info.h5,E3,atopic eczema,epidermis,CD45-
+SKN8090540,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090540/outs/molecule_info.h5,E3,atopic eczema,dermis,CD45+
+SKN8090541,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090541/outs/molecule_info.h5,E3,atopic eczema,dermis,CD45-
+SKN8090542,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090542/outs/molecule_info.h5,E3,atopic eczema,epidermis,CD45+
+SKN8090543,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090543/outs/molecule_info.h5,E3,atopic eczema,epidermis,CD45-
+SKN8090548,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090548/outs/molecule_info.h5,E4,atopic eczema,dermis,CD45+
+SKN8090549,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090549/outs/molecule_info.h5,E4,atopic eczema,dermis,CD45-
+SKN8090550,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090550/outs/molecule_info.h5,E4,atopic eczema,epidermis,CD45+
+SKN8090551,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090551/outs/molecule_info.h5,E4,atopic eczema,epidermis,CD45-
+SKN8090552,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090552/outs/molecule_info.h5,E4,atopic eczema,dermis,CD45+
+SKN8090553,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090553/outs/molecule_info.h5,E4,atopic eczema,dermis,CD45-
+SKN8090554,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090554/outs/molecule_info.h5,E4,atopic eczema,epidermis,CD45+
+SKN8090555,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090555/outs/molecule_info.h5,E4,atopic eczema,epidermis,CD45-
+SKN8090560,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090560/outs/molecule_info.h5,E1,atopic eczema,epidermis,live single
+SKN8090561,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090561/outs/molecule_info.h5,E1,atopic eczema,dermis,live single
+SKN8090562,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090562/outs/molecule_info.h5,E1,atopic eczema,epidermis,live single
+SKN8090563,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090563/outs/molecule_info.h5,E1,atopic eczema,dermis,live single
+SKN8090564,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090564/outs/molecule_info.h5,E1,atopic eczema,epidermis,live single
+SKN8090565,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090565/outs/molecule_info.h5,E1,atopic eczema,dermis,live single
+SKN8090566,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090566/outs/molecule_info.h5,E1,atopic eczema,epidermis,live single
+SKN8090567,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090567/outs/molecule_info.h5,E1,atopic eczema,dermis,live single
+SKN8090576,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090576/outs/molecule_info.h5,P1,psoriasis,dermis,CD45+
+SKN8090577,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090577/outs/molecule_info.h5,P1,psoriasis,dermis,CD45-
+SKN8090578,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090578/outs/molecule_info.h5,P1,psoriasis,epidermis,CD45+
+SKN8090579,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090579/outs/molecule_info.h5,P1,psoriasis,epidermis,CD45-
+SKN8090580,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090580/outs/molecule_info.h5,P1,psoriasis,dermis,CD45+
+SKN8090581,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090581/outs/molecule_info.h5,P1,psoriasis,dermis,CD45-
+SKN8090582,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090582/outs/molecule_info.h5,P1,psoriasis,epidermis,CD45+
+SKN8090583,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090583/outs/molecule_info.h5,P1,psoriasis,epidermis,CD45-
+SKN8090588,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090588/outs/molecule_info.h5,P2,psoriasis,dermis,CD45+
+SKN8090589,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090589/outs/molecule_info.h5,P2,psoriasis,dermis,CD45-
+SKN8090590,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090590/outs/molecule_info.h5,P2,psoriasis,epidermis,CD45+
+SKN8090591,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090591/outs/molecule_info.h5,P2,psoriasis,epidermis,CD45-
+SKN8090592,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090592/outs/molecule_info.h5,P2,psoriasis,dermis,CD45+
+SKN8090593,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090593/outs/molecule_info.h5,P2,psoriasis,dermis,CD45-
+SKN8090594,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090594/outs/molecule_info.h5,P2,psoriasis,epidermis,CD45+
+SKN8090595,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090595/outs/molecule_info.h5,P2,psoriasis,epidermis,CD45-
+SKN8090600,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090600/outs/molecule_info.h5,P3,psoriasis,dermis,CD45+
+SKN8090601,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090601/outs/molecule_info.h5,P3,psoriasis,dermis,CD45-
+SKN8090602,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090602/outs/molecule_info.h5,P3,psoriasis,epidermis,CD45+
+SKN8090603,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090603/outs/molecule_info.h5,P3,psoriasis,epidermis,CD45-
+SKN8090604,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090604/outs/molecule_info.h5,P3,psoriasis,dermis,CD45+
+SKN8090605,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090605/outs/molecule_info.h5,P3,psoriasis,dermis,CD45-
+SKN8090606,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090606/outs/molecule_info.h5,P3,psoriasis,epidermis,CD45+
+SKN8090607,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8090607/outs/molecule_info.h5,P3,psoriasis,epidermis,CD45-
+SKN8104894,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8104894/outs/molecule_info.h5,S4,normal,epidermis,keratinocytes CD49f-
+SKN8104895,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8104895/outs/molecule_info.h5,S4,normal,epidermis,keratinocytes CD49f+
+SKN8104896,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8104896/outs/molecule_info.h5,S4,normal,epidermis,lymphocytes
+SKN8104897,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8104897/outs/molecule_info.h5,S4,normal,epidermis,APCs
+SKN8104899,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8104899/outs/molecule_info.h5,S4,normal,dermis,fibroblasts
+SKN8104900,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8104900/outs/molecule_info.h5,S4,normal,dermis,endothelium
+SKN8104901,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8104901/outs/molecule_info.h5,S4,normal,dermis,APCs
+SKN8104902,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8104902/outs/molecule_info.h5,S4,normal,dermis,lymphocytes
+SKN8105192,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8105192/outs/molecule_info.h5,S5,normal,epidermis,keratinocytes CD49f-
+SKN8105193,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8105193/outs/molecule_info.h5,S5,normal,epidermis,keratinocytes CD49f+
+SKN8105194,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8105194/outs/molecule_info.h5,S5,normal,epidermis,lymphocytes
+SKN8105195,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8105195/outs/molecule_info.h5,S5,normal,epidermis,APCs
+SKN8105197,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8105197/outs/molecule_info.h5,S5,normal,dermis,fibroblasts
+SKN8105198,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8105198/outs/molecule_info.h5,S5,normal,dermis,endothelium
+SKN8105199,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8105199/outs/molecule_info.h5,S5,normal,dermis,APCs
+SKN8105200,/scratch-cbe/users/daniel.malzl/scanalysis/SKN8105200/outs/molecule_info.h5,S5,normal,dermis,lymphocytes
