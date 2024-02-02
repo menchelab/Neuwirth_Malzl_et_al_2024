@@ -52,8 +52,8 @@ scanpy_export_to_seurat <- function(mtx, cells, genes) {
 ```{r}
 tregs.tissue.scps <- scanpy_export_to_seurat(
   '../diffexp/tregs.tissue.scps.counts.mtx',
-  '../diffexp/tregs.tissue.tregs.obs.tsv',
-  '../diffexp/tregs.tissue.tregs.var.tsv'
+  '../diffexp/tregs.tissue.scps.obs.tsv',
+  '../diffexp/tregs.tissue.scps.var.tsv'
 )
 
 tregs.tissue.scps.sat1 <- scanpy_export_to_seurat(
@@ -192,9 +192,9 @@ write.de.results(tregs.tissue.scps.sat1.de.genes, '../diffexp/tregs.tissue.scps.
 write.de.results(tregs.tissue.uc.de.genes, '../diffexp/tregs.tissue.uc.de.all.tsv', FALSE)
 write.de.results(tregs.tissue.ad.de.genes, '../diffexp/tregs.tissue.ad.de.all.tsv', FALSE)
 write.de.results(tregs.pbmc.scps.de.genes, '../diffexp/tregs.pbmc.scps.de.all.tsv', FALSE)
-write.de.results(tregs.tissue.scps.de.genes, '../diffexp/tregs.tissue.scps.de.all.tsv', TRUE)
-write.de.results(tregs.tissue.scps.sat1.de.genes, '../diffexp/tregs.tissue.scps.sat1.de.all.tsv', TRUE)
-write.de.results(tregs.tissue.uc.de.genes, '../diffexp/tregs.tissue.uc.de.all.tsv', TRUE)
-write.de.results(tregs.tissue.ad.de.genes, '../diffexp/tregs.tissue.ad.de.all.tsv', TRUE)
-write.de.results(tregs.pbmc.scps.de.genes, '../diffexp/tregs.pbmc.scps.de.all.tsv', TRUE)
+write.de.results(tregs.tissue.scps.de.genes, '../diffexp/tregs.tissue.scps.de.signif.tsv', TRUE)
+write.de.results(tregs.tissue.scps.sat1.de.genes, '../diffexp/tregs.tissue.scps.sat1.de.signif.tsv', TRUE)
+write.de.results(tregs.tissue.uc.de.genes, '../diffexp/tregs.tissue.uc.de.signif.tsv', TRUE)
+write.de.results(tregs.tissue.ad.de.genes, '../diffexp/tregs.tissue.ad.de.signif.tsv', TRUE)
+write.de.results(tregs.pbmc.scps.de.genes, '../diffexp/tregs.pbmc.scps.de.signif.tsv', TRUE)
 ```

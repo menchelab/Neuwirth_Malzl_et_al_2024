@@ -148,7 +148,7 @@ def plot_clustering_and_expression(
     return fig, axs
 
 
-def raw_data_umap(adata, color, nhvg = 4000, **kwargs):
+def raw_data_umap(adata, color, nhvg = 4000, savefile = None, **kwargs):
     tmp = adata.copy()
     sc.pp.normalize_total(
         tmp, 
@@ -172,10 +172,16 @@ def raw_data_umap(adata, color, nhvg = 4000, **kwargs):
     )
     sc.tl.umap(tmp)
 
-    sc.pl.umap(
+    ax = sc.pl.umap(
         tmp,
         color = color,
         frameon = False,
+        show = False
         **kwargs
     )
+    
+    fig = ax[0].get_figure() if isinstance(ax, list) else ax.get_figure()
+    if savefile:
+        fig.savefig(savefile)
+
     del tmp
