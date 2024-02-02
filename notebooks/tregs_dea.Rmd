@@ -1,0 +1,201 @@
+---
+title: "DEA of Tregs"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(Matrix)
+library(Seurat)
+library(SeuratObject)
+library(dplyr)
+library(ggplot2)
+library(tidyverse)
+library(gridExtra)
+library(grid)
+
+
+scanpy_export_to_seurat <- function(mtx, cells, genes) {
+  data <- readMM(mtx)
+  data <- t(data)
+  
+  cells.table <- read.table(
+    cells,
+    sep = '\t',
+    header = TRUE,
+    row.names = 1
+  )
+  
+  genes.table <- read.table(
+    genes,
+    sep = '\t',
+    header = TRUE,
+    row.names = 1
+  )
+  
+  colnames(data) <- rownames(cells.table)
+  rownames(data) <- rownames(genes.table)
+  
+  obj <- CreateSeuratObject(
+    counts = as.sparse(data),
+    meta.data = cells.table
+  )
+  
+  return(obj)
+}
+```
+
+# Read data from files and put them into SeuratObjects
+
+```{r}
+skin.tissue <- scanpy_export_to_seurat(
+  'skin.tregs.counts.mtx',
+  'skin.tregs.obs.tsv',
+  'skin.tregs.genes.tsv'
+)
+
+skin.tissue.sat1 <- scanpy_export_to_seurat(
+  'skin.tregs.sat1.counts.mtx',
+  'skin.tregs.sat1.obs.tsv',
+  'skin.tregs.sat1.genes.tsv'
+)
+
+colon.tissue <- scanpy_export_to_seurat(
+  '../diffexp/colon.X.mtx',
+  '../diffexp/colon.obs.tsv',
+  '../diffexp/colon.genes.tsv'
+)
+
+skin.ad.tissue <- scanpy_export_to_seurat(
+  '../diffexp/skin_eczema.X.mtx',
+  '../diffexp/skin_eczema.obs.tsv',
+  '../diffexp/skin_eczema.genes.tsv'
+)
+```
+
+```{r}
+# split sat1 data into healthy and disease
+skin.sat1.healthy <- subset(skin.tissue.sat1, status == 'normal')
+skin.sat1.disease <- subset(skin.tissue.sat1, status != 'normal')
+```
+
+```{r}
+# assign ident as healthy and disease
+re.ident <- function(seurat.obj, column, old_true_id, new_true_id, new_false_id) {
+  Idents(
+    seurat.obj,
+    cells = rownames(
+      subset(
+        seurat.obj@meta.data, 
+        subset = endsWith(seurat.obj@meta.data[[column]], old_true_id)
+      )
+    )
+  ) <- new_true_id
+  Idents(
+    seurat.obj,
+    cells = rownames(
+      subset(
+        seurat.obj@meta.data, 
+        subset = !endsWith(seurat.obj@meta.data[[column]], old_true_id)
+      )
+    )
+  ) <- new_false_id
+  return(seurat.obj)
+}
+
+skin.tissue <- re.ident(skin.tissue, 'status', 'normal', 'Healthy', 'Disease')
+Idents(skin.tissue.sat1) <- skin.tissue.sat1@meta.data$sat1_status_majority_vote
+Idents(skin.sat1.disease) <- skin.sat1.disease@meta.data$sat1_status_majority_vote
+Idents(skin.sat1.healthy) <- skin.sat1.healthy@meta.data$sat1_status_majority_vote
+colon.tissue <- re.ident(colon.tissue, 'status', 'control', 'Healthy', 'Disease')
+```
+
+```{r}
+compute.de.genes <- function(seurat.obj, ident.1, ident.2) {
+  # MAST requires lognorm data see https://www.bioconductor.org/packages/release/bioc/vignettes/MAST/inst/doc/MAST-interoperability.html#21_From_scater_to_MAST
+  seurat.obj <- NormalizeData(
+    seurat.obj,
+    normalization.method = 'LogNormalize',
+    scale.factor = 10000
+  )
+  de.genes <- FindMarkers(
+    seurat.obj,
+    ident.1 = ident.1,
+    ident.2 = ident.2,
+    assay = "RNA",
+    test.use = 'MAST',
+    slot = "data",
+    min.pct = 0.1,
+    logfc.threshold = 0
+  )
+  lfc.threshold <- 0.5
+  pval.threshold <- 0.001
+  de.genes['significant'] <- de.genes$p_val_adj < pval.threshold & abs(de.genes$avg_log2FC) > lfc.threshold
+  de.genes['gene'] <- rownames(de.genes)
+  return(de.genes)
+}
+
+skin.tissue.de.genes <- compute.de.genes(skin.tissue, 'Disease', 'Healthy')
+skin.tissue.sat1.de.genes <- compute.de.genes(skin.tissue.sat1, 'SAT1_hi', 'SAT1_lo')
+skin.sat1.disease.de.genes <- compute.de.genes(skin.sat1.disease, 'SAT1_hi', 'SAT1_lo')
+skin.sat1.healthy.de.genes <- compute.de.genes(skin.sat1.healthy, 'SAT1_hi', 'SAT1_lo')
+colon.tissue.de.genes <- compute.de.genes(colon.tissue, 'Disease', 'Healthy')
+```
+
+```{r, fig.height = 20, fig.width = 10}
+library(ggrepel)
+plot.volcano <- function(de.genes, title, abs.xlim = 15) {
+  lfc.threshold <- 0.5
+  pval.threshold <- 0.001
+  g <- ggplot(
+    de.genes, 
+    aes(x = avg_log2FC, y = -log10(p_val_adj), color = significant)
+  ) + 
+  geom_point() +
+  ggtitle(title) +
+  geom_vline(xintercept = c(-lfc.threshold, lfc.threshold), linetype = 'dashed') + 
+  geom_hline(yintercept = -log10(pval.threshold), linetype = 'dashed') +
+  scale_x_continuous(limits = c(-abs.xlim, abs.xlim)) + 
+  geom_label_repel(
+    aes(label = gene), 
+    size = 3, 
+    data = . %>% filter(significant),
+    max.overlaps = 20
+  )
+  return(g)
+}
+
+plot.volcano(skin.tissue.de.genes, 'skin.tissue')
+plot.volcano(skin.tissue.sat1.de.genes, 'skin.tissue.sat1')
+plot.volcano(skin.sat1.disease.de.genes, 'skin.sat1.disease')
+plot.volcano(skin.sat1.disease.de.genes, 'skin.sat1.healthy')
+plot.volcano(colon.tissue.de.genes, 'colon.tissue')
+```
+
+```{r}
+write.de.results <- function(de.genes, filename, significant.only) {
+  if (significant.only) {
+    de.genes <- de.genes %>% subset(subset = significant)
+  }
+  de.genes %>%
+    write.table(
+      filename,
+      row.names = FALSE,
+      quote = FALSE,
+      sep = '\t'
+    )
+}
+write.de.results(skin.tissue.de.genes, '../diffexp/skin.tregs.de.all.tsv', FALSE)
+write.de.results(skin.tissue.sat1.de.genes, '../diffexp/skin.tregs.sat1.de.all.tsv', FALSE)
+write.de.results(skin.sat1.disease.de.genes, '../diffexp/skin.tregs.sat1.disease.de.all.tsv', FALSE)
+write.de.results(skin.sat1.healthy.de.genes, '../diffexp/skin.tregs.sat1.healthy.de.all.tsv', FALSE)
+write.de.results(colon.tissue.de.genes, '../diffexp/colon.tregs.de.all.tsv', FALSE)
+write.de.results(skin.tissue.de.genes, '../diffexp/skin.tregs.de.signif.tsv', TRUE)
+write.de.results(skin.tissue.sat1.de.genes, '../diffexp/skin.tregs.sat1.de.signif.tsv', TRUE)
+write.de.results(skin.sat1.disease.de.genes, '../diffexp/skin.tregs.sat1.disease.de.signif.tsv', TRUE)
+write.de.results(skin.sat1.healthy.de.genes, '../diffexp/skin.tregs.sat1.healthy.de.signif.tsv', TRUE)
+write.de.results(colon.tissue.de.genes, '../diffexp/colon.tregs.de.signif.tsv', TRUE)
+```

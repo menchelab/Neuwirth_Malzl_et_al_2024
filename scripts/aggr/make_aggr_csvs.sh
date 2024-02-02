@@ -1,0 +1,2 @@
+python3 scripts/generate_aggr_csv.py -i accessions/UC_SRA_metadata.txt -s "Sample Name" -d /groups/pavri/bioinfo/daniel/scStary/cellranger -c subject_status tissue -r Status Tissue -o accessions/aggr_uc.csv
+python3 scripts/generate_aggr_csv.py -i accessions/PS_ENA_metadata.tsv -s sample_id -d /scratch-cbe/users/daniel.malzl/scanalysis -c patient_id Status Tissue Cell_fraction -o accessions/aggr_ps.csv --delimiter "\t"
