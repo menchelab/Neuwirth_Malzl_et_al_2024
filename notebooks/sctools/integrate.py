@@ -2,6 +2,18 @@ import scvi
 
 import scanpy as sc
 
+def filter_too_few_cell_batches(adata, batch_key, min_cells = 5):
+    cells_per_batch = adata.obs.groupby(batch_key).count().iloc[:, 0]
+    print(
+        f'filtered the following batches < {min_cells} cells: ', 
+        cells_per_batch[cells_per_batch < min_cells]
+    )
+    enough_cells = adata.obs[batch_key].apply(
+        lambda x: cells_per_batch[x] >= min_cells
+    )
+    enough_cells_idx = enough_cells[enough_cells]
+    return adata[enough_cells_idx].copy()
+
 
 def integrate_data_scvi(
     adata, 
@@ -12,9 +24,16 @@ def integrate_data_scvi(
     n_top_genes = 4000,
     use_gpu = True,
     max_epochs = None,
-    train_size = 0.9
+    train_size = 0.9,
+    filter_small_batches = True
     
 ):
+    if filter_small_batches:
+        adata = filter_too_few_cell_batches(adata, batch_key)
+
+    else:
+        adata = adata.copy()
+
     adata.layers['counts'] = adata.X.copy()
     adata.raw = adata
     
