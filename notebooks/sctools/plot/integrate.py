@@ -176,7 +176,7 @@ def raw_data_umap(adata, color, nhvg = 4000, savefile = None, **kwargs):
         tmp,
         color = color,
         frameon = False,
-        show = False
+        show = False,
         **kwargs
     )
     
