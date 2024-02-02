@@ -105,7 +105,8 @@ def plot_integration_results(
                 **kwargs
             )
             if legend_off:
-                ax.get_legend().remove()
+                legend = ax.legend()
+                legend.remove()
         
         top_ax = axs[0] if one_dimensional else axs[0, i]
         top_ax.set_title(k)
@@ -161,7 +162,8 @@ def plot_clustering_and_expression(
                 **kwargs
             )
             if legend_off:
-                ax.get_legend().remove()
+                legend = ax.legend()
+                legend.remove()
         
         top_ax = axs[0, i] if len(axs.shape) > 1 else axs[0]
         top_ax.set_title(k)
