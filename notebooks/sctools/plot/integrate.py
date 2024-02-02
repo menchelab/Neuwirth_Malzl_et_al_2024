@@ -36,13 +36,16 @@ def plot_leiden_clusterings(
         )
         
         one_dimensional = len(data_dict) == 1
-        for ax, resolution in zip(axs if one_dimensional else axs[i, :], resolutions):
+        for ax, resolution in zip(
+            axs if one_dimensional else axs[i, :], 
+            resolutions
+        ):
             sc.tl.leiden(
                 tmp, 
                 key_added = f'leiden_scvi_{resolution}',
                 resolution = resolution
             )
-            sc.pl.umap(
+            ax = sc.pl.umap(
                 tmp[idx],
                 color = f'leiden_scvi_{resolution}',
                 frameon = False,
@@ -61,7 +64,16 @@ def plot_leiden_clusterings(
     return fig, axs
 
 
-def plot_integration_results(data_dict, color_keys, params_list = None, data_key = None, panelheight = 5, panelwidth = 6, subsample = 1):
+def plot_integration_results(
+    data_dict, 
+    color_keys, 
+    params_list = None, 
+    data_key = None, 
+    panelheight = 5, 
+    panelwidth = 6, 
+    subsample = 1,
+    legend_off = False
+):
     fig, axs = plt.subplots(len(color_keys), len(data_dict))
     for i, (k, d) in enumerate(data_dict.items()):
         if data_key:
@@ -79,7 +91,11 @@ def plot_integration_results(data_dict, color_keys, params_list = None, data_key
             replace = False
         )
         one_dimensional = len(data_dict) == 1
-        for ax, color_key, kwargs in zip(axs if one_dimensional else axs[:, i], color_keys, params_list):
+        for ax, color_key, kwargs in zip(
+            axs if one_dimensional else axs[:, i], 
+            color_keys, 
+            params_list
+        ):
             sc.pl.umap(
                 data[idx],
                 color = color_key,
@@ -88,6 +104,8 @@ def plot_integration_results(data_dict, color_keys, params_list = None, data_key
                 ax = ax,
                 **kwargs
             )
+            if legend_off:
+                ax.get_legend().remove()
         
         top_ax = axs[0] if one_dimensional else axs[0, i]
         top_ax.set_title(k)
@@ -107,7 +125,8 @@ def plot_clustering_and_expression(
     data_key = None,     
     panelheight = 5, 
     panelwidth = 6, 
-    subsample = 1
+    subsample = 1,
+    legend_off = False
 ):
     fig, axs = plt.subplots(len(expression_keys) + 1, len(data_dict))
     for i, (k, d) in enumerate(data_dict.items()):
@@ -128,7 +147,11 @@ def plot_clustering_and_expression(
         )
             
         one_dimensional = len(data_dict) == 1
-        for ax, color_key, kwargs in zip(axs if one_dimensional else axs[:, i], color_keys, params_list):
+        for ax, color_key, kwargs in zip(
+            axs if one_dimensional else axs[:, i], 
+            color_keys, 
+            params_list
+        ):
             sc.pl.umap(
                 data[idx],
                 color = color_key,
@@ -137,6 +160,8 @@ def plot_clustering_and_expression(
                 ax = ax,
                 **kwargs
             )
+            if legend_off:
+                ax.get_legend().remove()
         
         top_ax = axs[0, i] if len(axs.shape) > 1 else axs[0]
         top_ax.set_title(k)
