@@ -157,8 +157,7 @@ def raw_data_umap(adata, color, nhvg = 4000, **kwargs):
     sc.pp.log1p(tmp)
     sc.pp.highly_variable_genes(
         tmp,
-        n_top_genes = 4000,
-        layer = "counts",
+        n_top_genes = nhvg,
         flavor = "seurat_v3",
     )
     sc.pp.pca(
