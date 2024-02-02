@@ -5,7 +5,7 @@ import scanpy as sc
 def filter_too_few_cell_batches(adata, batch_key, min_cells = 5):
     cells_per_batch = adata.obs.groupby(batch_key).count().iloc[:, 0]
     print(
-        f'filtered the following batches < {min_cells} cells: ', 
+        f'filtered the following batches < {min_cells} cells:\n', 
         cells_per_batch[cells_per_batch < min_cells]
     )
     enough_cells = adata.obs[batch_key].apply(
