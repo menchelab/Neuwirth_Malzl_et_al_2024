@@ -11,8 +11,7 @@ def filter_too_few_cell_batches(adata, batch_key, min_cells = 5):
     enough_cells = adata.obs[batch_key].apply(
         lambda x: cells_per_batch[x] >= min_cells
     )
-    enough_cells_idx = enough_cells[enough_cells]
-    return adata[enough_cells_idx].copy()
+    return adata[enough_cells].copy()
 
 
 def integrate_data_scvi(
