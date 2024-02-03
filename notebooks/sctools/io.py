@@ -53,8 +53,13 @@ def read_sc_data(
     return adata
 
 
-def initialize_from_raw(file):
-    adata = sc.read_h5ad(file)
+def initialize_from_raw(file_or_adata):
+    if isinstance(file_or_adata, ad.AnnData):
+        adata = file_or_adata
+    
+    else:
+        adata = sc.read_h5ad(file_or_adata)
+
     obs = adata.obs.copy()
     var = adata.raw.var.copy()
     adata = ad.AnnData(
