@@ -1,0 +1,318 @@
+---
+title: "cell_cell_communication"
+output: html_document
+date: "2023-03-15"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(CellChat)
+library(patchwork)
+library(dplyr)
+library(Matrix)
+options(stringsAsFactors = FALSE)
+```
+# Loading data and preparing analysis
+```{r}
+data <- readMM(
+  '../data/inflamatory_disease_skin.log1p.mtx'
+)
+```
+```{r}
+meta <- read.table(
+  '../data/inflammatory_disease_skin.metadata.tsv',
+  sep = '\t',
+  header = TRUE,
+  row.names = 1
+)
+meta <- meta %>% mutate(
+  disease_status = as.factor(replace(status, status != 'normal', 'disease'))
+)
+head(meta)
+```
+```{r}
+genes <- read.table(
+  '../data/inflammatory_disease_skin.genes.tsv',
+  sep = '\t',
+  header = TRUE,
+  row.names = 1
+)
+head(genes)
+```
+```{r}
+colnames(data) <- rownames(meta)
+rownames(data) <- rownames(genes)
+```
+```{r}
+meta$celltype_coarse <- sub('(.*)-[0-9]', '\\1', meta$celltype)
+head(meta)
+```
+```{r}
+meta_list <- split(
+  meta,
+  meta$disease_status
+)
+cellchats <- list(
+  "disease" = createCellChat(
+    as.matrix(data[,rownames(meta_list$disease)]),
+    meta = meta_list$disease,
+    group.by = "celltype"
+  ),
+  "normal" = createCellChat(
+    data[,rownames(meta_list$normal)],
+    meta = meta_list$normal,
+    group.by = "celltype"
+  )
+)
+```
+```{r}
+CellChatDB <- CellChatDB.human
+showDatabaseCategory(CellChatDB)
+```
+```{r}
+set.db <- function(cellchat, db) {
+  cellchat@DB <- db
+  return(cellchat)
+}
+
+cellchats <- lapply(
+  cellchats,
+  set.db,
+  db = CellChatDB
+)
+```
+```{r}
+cellchats <- lapply(
+  cellchats,
+  subsetData
+)
+```
+```{r}
+future::plan('multisession', workers = 2)
+options(future.globals.maxSize= 1891289600)
+cellchats <- lapply(
+  cellchats,
+  identifyOverExpressedGenes
+)
+cellchats <- lapply(
+  cellchats,
+  identifyOverExpressedInteractions
+)
+```
+```{r}
+future::plan('multisession', workers = 2)
+options(future.globals.maxSize= 1891289600)
+cellchats <- lapply(
+  cellchats,
+  computeCommunProb
+)
+```
+```{r}
+saveRDS(cellchats, '../data/inflammatory_disease_cellchat.rds')
+```
+```{r}
+cellchats <- readRDS('../data/inflammatory_disease_cellchat.rds')
+```
+```{r}
+cellchats <- lapply(
+  cellchats,
+  filterCommunication,
+  min.cells = 10
+)
+```
+```{r}
+cellchats <- lapply(
+  cellchats,
+  computeCommunProbPathway
+)
+```
+```{r}
+cellchats <- lapply(
+  cellchats,
+  aggregateNet
+)
+```
+```{r}
+makeNetViz <- function(cellchat) {
+  groupSize <- as.numeric(table(cellchat@idents))
+  par(mfrow = c(1,2), xpd=TRUE)
+  netVisual_circle(
+    cellchat@net$count, 
+    vertex.weight = groupSize, 
+    weight.scale = T, 
+    label.edge= F, 
+    title.name = "Number of interactions"
+  )
+  netVisual_circle(
+    cellchat@net$weight, 
+    vertex.weight = groupSize,
+    weight.scale = T, 
+    label.edge = F, 
+    title.name = "Interaction weights/strength"
+  )
+}
+lapply(
+  cellchats,
+  makeNetViz
+)
+```
+```{r, fig.width = 15, fig.height = 10}
+pdf(
+  '../plots/inflammatory_comm_per_cell.pdf',
+  width = 24,
+  height = 12
+)
+mat <- cellchats$disease@net$weight
+groupSize <- as.numeric(table(cellchats$disease@idents))
+par(mfrow = c(3, 6), xpd=TRUE)
+for (i in 1:nrow(mat)) {
+  mat2 <- matrix(0, nrow = nrow(mat), ncol = ncol(mat), dimnames = dimnames(mat))
+  mat2[i, ] <- mat[i, ]
+  netVisual_circle(mat2, vertex.weight = groupSize, weight.scale = T, edge.weight.max = max(mat), title.name = rownames(mat)[i])
+}
+dev.off()
+```
+```{r}
+unique(CellChatDB$interaction$pathway_name)
+```
+```{r}
+makePathwayViz <- function(cellchat, vertex.receiver, pathway.show) {
+  netVisual_aggregate(
+    cellchat, 
+    signaling = pathways.show,  
+    vertex.receiver = vertex.receiver
+  )
+}
+pathways.show <- 'CXCL'
+ps <- lapply(
+  cellchats,
+  makePathwayViz,
+  pathway.show = pathway.show
+)
+```
+```{r}
+par(mfrow=c(1,1))
+netVisual_heatmap(cellchats$disease, signaling = pathways.show, color.heatmap = "Reds")
+netVisual_heatmap(cellchats$normal, signaling = pathways.show, color.heatmap = "Reds")
+```
+```{r}
+cellchats <- lapply(
+  cellchats,
+  netAnalysis_computeCentrality,
+  slot.name = 'netP'
+)
+```
+```{r}
+netAnalysis_signalingRole_network(cellchats$disease, signaling = pathways.show, width = 8, height = 2.5, font.size = 10)
+netAnalysis_signalingRole_network(cellchats$normal, signaling = pathways.show, width = 8, height = 2.5, font.size = 10)
+```
+```{r, fig.height = 10, fig.width = 10}
+importantInOut <- function(cellchat) {
+  ht1 <- netAnalysis_signalingRole_heatmap(cellchat, pattern = "outgoing", width = 10, height = 30)
+  ht2 <- netAnalysis_signalingRole_heatmap(cellchat, pattern = "incoming", width = 10, height = 30)
+  ht1 + ht2
+}
+ps <- lapply(
+  cellchats,
+  importantInOut
+)
+ps
+```
+```{r}
+pdf(
+  '../plots/interactions.pdf',
+  width = 20,
+  height = 20
+)
+print(ps$disease)
+dev.off()
+```
+```{r, fig.width = 35, fig.height = 10}
+plot.contribution <- function(cellchat, pathways, layout.nrow, layout.ncol) {
+  p <- netAnalysis_contribution(cellchat, signaling = pathways[1], return.data = TRUE)$gg.obj
+  for (pathway.show in pathways[2:length(pathways)]) {
+    p <- p + netAnalysis_contribution(cellchat, signaling = pathway.show, return.data = TRUE)$gg.obj
+  }
+  p <- p + plot_layout(nrow = layout.nrow, ncol = layout.ncol)
+}
+
+pathways.incoming <- c(
+  'MIF', 'COLLAGEN', 'CD99', 'GALECTIN', 'SELE', 'CXCL', 'MHC-II', 'FN1', 'LAMININ', 'APP', 'ADGRE5', 'THBS', 'CCL',
+  'NECTIN', 'MK', 'ALCAM', 'SELPLG', 'TNF', 'PTN', 'SPP1', 'CD86', 'CD45', 'CD80', 'OX40', 'PVR', 'CD70', 'IL16',
+  'CD137', 'BTLA'
+)
+plot.contribution(
+  cellchats$disease,
+  pathways.incoming,
+  6, 5
+)
+ggsave('../plots/inflammatory_pathways_incoming.pdf', width = 35, height = 35)
+```
+```{r}
+plot.max.contribution.chord <- function(cellchat, pathways) {
+  for (pathway in pathways) {
+    contributions <- netAnalysis_contribution(cellchat, signaling = pathway, return.data = TRUE)$LR.contribution
+    max.contributing.LR <- rownames(contributions)[1]
+    netVisual_individual(cellchat, signaling = pathway, pairLR.use = max.contributing.LR)
+  }
+}
+
+pdf(
+  '../plots/inflammatory_max_contribution_incoming_chord.pdf',
+  width = 10,
+  height = 10
+)
+par(mfrow = c(6, 5), xpd=TRUE)
+plot.max.contribution.chord(
+  cellchats$disease,
+  pathways.incoming
+)
+dev.off()
+```
+```{r}
+pathways.outgoing <- c(
+  'MIF', 'CD99', 'MHC-I', 'MHC-II', 'CLEC', 'VISFATIN', 'ITGB2', 'CD45', 'TIGIT', 'SELPLG', 'CD6', 'LCK',
+  'CD96', 'CD46', 'SELL', 'TGFb'
+)
+plot.contribution(
+  cellchats$disease,
+  pathways.outgoing,
+  4, 4
+)
+ggsave('../plots/inflammatory_pathways_outgoing.pdf', width = 15, height = 15)
+```
+```{r}
+pdf(
+  '../plots/inflammatory_max_contribution_outgoing_chord.pdf',
+  width = 10,
+  height = 10
+)
+par(mfrow = c(4, 4), xpd=TRUE)
+plot.max.contribution.chord(
+  cellchats$disease,
+  pathways.outgoing
+)
+dev.off()
+```
+```{r}
+pairLR.CXCL <- extractEnrichedLR(cellchats$Disease, signaling = pathways.show, geneLR.return = FALSE)
+LR.show <- pairLR.CXCL[14,] # show one ligand-receptor pair
+# Hierarchy plot
+p <- netVisual_individual(
+  cellchats$Disease, 
+  signaling = pathways.show,  
+  pairLR.use = LR.show,
+  vertex.receiver = c(16, 17)
+)
+```
+```{r}
+pairLR.CXCL <- extractEnrichedLR(cellchats$Normal, signaling = pathways.show, geneLR.return = FALSE)
+LR.show <- pairLR.CXCL[3,] # show one ligand-receptor pair
+# Hierarchy plot
+p <- netVisual_individual(
+  cellchats$Normal, 
+  signaling = pathways.show,  
+  pairLR.use = LR.show,
+  vertex.receiver = c(16, 17)
+)
+```

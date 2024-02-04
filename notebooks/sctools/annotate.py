@@ -1,5 +1,6 @@
 import scanpy as sc
 import pandas as pd
+import numpy as np
 
 
 def majority_vote(adata, prediction_col, clustering_resolution, majority_col_name = None):
@@ -26,4 +27,19 @@ def majority_vote(adata, prediction_col, clustering_resolution, majority_col_nam
             adata.obs.pop(col)
     
     adata.obs = adata.obs.join(majority)
-    
+
+
+def annotate_adata_on_gene_hi_lo(adata, gene, resolution = 5):
+    expression_values = adata[:, gene].X.toarray().flatten()
+    threshold = np.median(expression_values)
+    status_column = f'{gene.lower()}_status'
+    adata.obs[status_column] = np.select(
+        [expression_values < threshold, expression_values >= threshold],
+        [f'{gene}_lo', f'{gene}_hi']
+    )
+    majority_vote(
+        adata,
+        status_column,
+        resolution,
+        f'{status_column}_majority_vote'
+    )
