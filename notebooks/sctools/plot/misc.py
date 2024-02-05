@@ -65,7 +65,6 @@ def generate_and_save_for_figure(
         fig.set_figwidth(width)
         fig.set_figheight(height)
         fig.tight_layout()
-        plt.show()
         fig.savefig(scatter_save_file.format(col), dpi = scatter_dpi)
             
         
@@ -86,14 +85,14 @@ def generate_and_save_for_figure(
             )
         
             # remove scatters
-            ax.collections.clear()
+            ax.clear()
             fig.savefig(legend_save_file.format(col))
-            plt.close(fig)
         
         if not colorbar:
             # remove scatters
-            ax.collections.clear()
+            ax.clear()
             ax.legend(handles, labels)
             fig.savefig(legend_save_file.format(col))
-            plt.close(fig)
+        
+        plt.close(fig)
             
