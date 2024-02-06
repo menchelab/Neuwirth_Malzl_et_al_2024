@@ -360,6 +360,9 @@ def add_legend(
         
         start_xpos = axis_label_x + axis_label_width + horizontal_spacing * 2
         current_group_label_ypos = group_legend_height - legend_row_space / 2
+        # this actually needs to come from group_info
+        # to make sure that we don't show groups that are not
+        # in the group_info when using dict palettes
         for group_label, g_colors in group_colors.items():
             _ = ax.text(
                 start_xpos,
