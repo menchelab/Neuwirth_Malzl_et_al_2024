@@ -352,7 +352,7 @@ def add_legend(
             fontsize = 8,
             va = 'center'
         )
-        axis_label_x, _, axis_label_width, axis_label_height = get_text_extents(
+        axis_label_x, _, axis_label_width, _ = get_text_extents(
             axis_label_text, 
             renderer,
             inverse_ax_transform
