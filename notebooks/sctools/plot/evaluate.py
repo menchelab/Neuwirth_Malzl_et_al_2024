@@ -232,7 +232,7 @@ def group_heatmap_data(data, x_groupby, y_groupby, x_group_df, y_group_df):
 
 
 def groups_to_colors(group_info, palette_name):
-    groups = group_info.unique()
+    groups = sorted(group_info.unique())
     palette = sns.color_palette(palette_name, len(groups))
     colormap = {
         group: palette[i] for i, group in enumerate(groups)
@@ -240,8 +240,13 @@ def groups_to_colors(group_info, palette_name):
     return colormap
 
 
-def group_info_to_colors(group_info, y_grouper, palette_name):
-    colormap = groups_to_colors(group_info, palette_name)
+def group_info_to_colors(group_info, y_grouper, palette):
+    if isinstance(palette, str):
+        colormap = groups_to_colors(group_info, palette)
+    
+    else:
+        colormap = palette
+
     color_array = np.zeros(shape = (1, len(group_info), 3))
     for i, (_, group_label) in enumerate(group_info.items()):
         color_array[0, i, :] = colormap[group_label]
@@ -260,7 +265,11 @@ def add_group_annotation(
     for i, (group, group_info) in enumerate(group_info_dict.items()):
         ax = axs[group]
         ax.imshow(
-            group_info_to_colors(group_info, y_grouper, palette_name = group_palettes[group]),
+            group_info_to_colors(
+                group_info, 
+                y_grouper, 
+                palette = group_palettes[group]
+            ),
             aspect = 'auto',
             interpolation = 'none'
         )
@@ -324,9 +333,15 @@ def add_legend(
         [x_group_info, y_group_info],
         [x_group_palettes, y_group_palettes]
     ):
-        group_colors = {
-            g: groups_to_colors(g_info, group_palettes[g]) for g, g_info in group_info.items()
-        }
+        group_colors = {}
+        for g, g_info in group_info.items():
+            palette = group_palettes[g]
+            if isinstance(palette, str):
+                group_colors[g] = groups_to_colors(g_info, palette)
+
+            else:
+                group_colors[g] = palette
+
         n_legend_rows = len(group_info) * 2 # * 2 because group label is on top
         group_legend_height = legend_row_space * n_legend_rows + vertical_spacing * (n_legend_rows - 1) + legend_ypos
         alignment_ypos = group_legend_height - 1.5 * legend_row_space - vertical_spacing # 1.5 to put it in second row
@@ -337,7 +352,7 @@ def add_legend(
             fontsize = 8,
             va = 'center'
         )
-        axis_label_x, axis_label_y, axis_label_width, axis_label_height = get_text_extents(
+        axis_label_x, _, axis_label_width, axis_label_height = get_text_extents(
             axis_label_text, 
             renderer,
             inverse_ax_transform
@@ -346,7 +361,7 @@ def add_legend(
         start_xpos = axis_label_x + axis_label_width + horizontal_spacing * 2
         current_group_label_ypos = group_legend_height - legend_row_space / 2
         for group_label, g_colors in group_colors.items():
-            group_label_text = ax.text(
+            _ = ax.text(
                 start_xpos,
                 current_group_label_ypos,
                 group_label,
@@ -375,7 +390,7 @@ def add_legend(
                     fontsize = 6,
                     va = 'center'
                 )
-                _, _, label_width, label_height = get_text_extents(
+                _, _, label_width, _= get_text_extents(
                     label_text,
                     renderer,
                     inverse_ax_transform
