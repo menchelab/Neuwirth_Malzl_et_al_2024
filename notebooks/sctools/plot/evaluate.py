@@ -264,15 +264,15 @@ def add_group_annotation(
     heatmap = axs['heatmap']
     for i, (group, group_info) in enumerate(group_info_dict.items()):
         ax = axs[group]
-        ax.imshow(
-            group_info_to_colors(
-                group_info, 
-                y_grouper, 
-                palette = group_palettes[group]
-            ),
-            aspect = 'auto',
-            interpolation = 'none'
+        # using pcolormesh here due to weird change of color
+        # when importing in illustrator
+        color_array = group_info_to_colors(
+            group_info, 
+            y_grouper, 
+            palette = group_palettes[group]
         )
+        ax.pcolormesh(color_array[::-1])
+        
         if i == 0 and plot_first_group_borders:
             border = group_info.value_counts(sort = False).iloc[0] - 0.5
             line_drawer = heatmap.axhline if y_grouper else heatmap.axvline
