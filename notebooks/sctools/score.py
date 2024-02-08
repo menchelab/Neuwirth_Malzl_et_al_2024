@@ -36,7 +36,6 @@ def gene_module_score(adata, gene_list):
         ),
         index = adata.var.index
     )
-
     
     control_genes = set()
     for gene in filtered_gene_list:
