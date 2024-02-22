@@ -1,0 +1,105 @@
+```{r, setup}
+library(edgeR)
+library(DESeq2)
+library(dplyr)
+
+build.file.list <- function(prefixes, suffixes) {
+  files <- list()
+  for (prefix in prefixes){
+    for (suffix in suffixes) {
+      key <- paste(prefix, suffix, sep = '_')
+      files[[key]] <- list(
+        counts = paste0('diffbind/', key, '.count.csv'),
+        meta = paste0('diffbind/', key, '.meta.csv')
+      )
+    }
+  }
+  return(files)
+}
+
+read.tables <- function(file.list) {
+  counts <- read.csv(
+    file.list$counts, 
+    row.names = 1
+  )
+  meta <- read.csv(
+    file.list$meta, 
+    row.names = 1
+  )
+  meta$condition <- factor(
+    meta$condition, 
+    levels = c('nt', 'sat1')
+  )
+  res <- list(counts = counts, meta = meta)
+  return(res)
+}
+
+compute.norm.factors <- function(counts) {
+  lib.sizes <- colSums(counts)
+  norm.factors <- lib.sizes/mean(lib.sizes)
+  return(norm.factors)
+}
+
+diffbind.deseq <- function(file.list, size.factors = 'RLE') {
+  data <- read.tables(file.list)
+  dds <- DESeq2::DESeqDataSetFromMatrix(
+    data$counts, 
+    data$meta, 
+    ~condition
+  )
+  if (size.factors == 'lib') {
+    print('computing size factors from mean libsize')
+    DESeq2::sizeFactors(dds) <- compute.norm.factors(data$counts)
+  } else {
+    print('computing size factors via RLE')
+    dds <- DESeq2::estimateSizeFactors(dds)
+  }
+  
+  dds <- DESeq2::estimateDispersions(dds, fitType = 'local')
+  dds <- DESeq2::nbinomWaldTest(dds)
+  res <- DESeq2::results(dds)
+  return(res)
+}
+
+diffbind.edgeR <- function(file.list) {
+  data <- read.tables(file.list)
+  dge <- edgeR::DGEList(
+    counts = data$counts,
+    group = data$meta$condition
+  )
+  dge <- edgeR::calcNormFactors(
+    dge, 
+    method = 'TMM', 
+    doWeighting = FALSE
+  )
+  design <- model.matrix(~data$meta$condition)
+  dge <- edgeR::estimateDisp(dge, design)
+  fit <- edgeR::glmFit(dge, design)
+  lrt <- edgeR::glmLRT(fit, coef = 2)
+  return(lrt$table)
+}
+
+write.csvs <- function(result.list, suffix) {
+  for (key in names(result.list)) {
+    write.csv(
+      result.list[[key]],
+      paste0('diffbind/', key, '.', suffix, '.csv'),
+      quote = FALSE
+    )
+  }
+}
+
+```
+```{r}
+files <- c(
+  build.file.list(c('gene', 'tss', 'promoter', 'extended_gene'), c('h3k27ac', 'h3k4me1')),
+  build.file.list(c('h3k27ac', 'h3k4me1'), c('all', 'reproducible'))
+)
+```
+```{r}
+deseq.results <- lapply(files, diffbind.deseq)
+write.csvs(deseq.results, 'deseq')
+
+deseq.results <- lapply(files, diffbind.edgeR)
+write.csvs(deseq.results, 'edgeR')
+```

@@ -2,6 +2,7 @@ data/
 plots/
 diffexp/
 cellchat/
+markers/
 notebooks/.ipynb_checkpoints/
 notebooks/*/.ipynb_checkpoints/
 notebooks/sctools/__pycache__/
