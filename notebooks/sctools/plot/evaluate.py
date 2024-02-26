@@ -360,9 +360,6 @@ def add_legend(
         
         start_xpos = axis_label_x + axis_label_width + horizontal_spacing * 2
         current_group_label_ypos = group_legend_height - legend_row_space / 2
-        # this actually needs to come from group_info
-        # to make sure that we don't show groups that are not
-        # in the group_info when using dict palettes
         for group_label, g_colors in group_colors.items():
             _ = ax.text(
                 start_xpos,
@@ -436,6 +433,21 @@ def set_axes_extents(
     ax.set_ylim(0, ymax)
     ax.set_yticks([])
     ax.set_xticks([])
+
+
+def get_subset_tick_pos_and_labels(labels, subset = None):
+    if not subset:
+        return np.arange(len(labels)) + 0.5, labels
+    
+    tick_pos, tick_labels = [], []
+    for i, label in enumerate(labels):
+        if not label in subset:
+            continue
+
+        tick_pos.append(i + 0.5)
+        tick_labels.append(label)
+    
+    return tick_pos, tick_labels
         
         
 def grouped_heatmap(
@@ -449,6 +461,7 @@ def grouped_heatmap(
     vmax = None, 
     show_var_labels = False, 
     swap_axes = False,
+    var_labels_to_show = None,
     figwidth = 10,
     figheight = 10
 ):
@@ -468,14 +481,15 @@ def grouped_heatmap(
         x_group_info, y_group_info = swap(x_group_info, y_group_info)
         x_groupby, y_groupby = swap(x_groupby, y_groupby)
         x_group_palettes, y_group_palettes = swap(x_group_palettes, y_group_palettes)
-        width_min = xy_grouped_data.shape[1] * 0.2 
-        width = width_min if show_var_labels and figwidth < width_min else figwidth
+        # width_min = xy_grouped_data.shape[1] * 0.2 
+        # width = width_min if show_var_labels and figwidth < width_min else figwidth
+        width = figwidth
         height = figheight
         
-        
     else:
-        height_min = len(xy_grouped_data) * 0.2
-        height = height_min if show_var_labels and figheight < height_min else figheight
+        # height_min = len(xy_grouped_data) * 0.2
+        # height = height_min if show_var_labels and figheight < height_min else figheight
+        height = figheight
         width = figwidth
 
     fig, axs = setup_figure(width, height, x_groupby, y_groupby)
@@ -483,7 +497,7 @@ def grouped_heatmap(
     add_ygroup_annotation(y_group_info, axs, y_group_palettes)
     
     if 'legend' in axs:
-        patch_dim_ratio = height / width
+        # patch_dim_ratio = height / width
         set_axes_extents(
             fig,
             axs['legend'],
@@ -518,8 +532,12 @@ def grouped_heatmap(
     
         if show_var_labels:
             labels = xy_grouped_data.columns
-            axs['x_axis'].set_xticks(range(len(labels)))
-            axs['x_axis'].set_xticklabels(labels, rotation = 90)
+            tick_pos, tick_labels = get_subset_tick_pos_and_labels(
+                labels,
+                var_labels_to_show
+            )
+            axs['x_axis'].set_xticks(tick_pos)
+            axs['x_axis'].set_xticklabels(tick_labels, rotation = 90)
 
         else:
             axs['x_axis'].set_xticks([])
@@ -529,8 +547,12 @@ def grouped_heatmap(
     
         if show_var_labels:
             labels = xy_grouped_data.index
-            axs['y_axis'].set_yticks(range(len(labels)))
-            axs['y_axis'].set_yticklabels(labels)
+            tick_pos, tick_labels = get_subset_tick_pos_and_labels(
+                labels,
+                var_labels_to_show
+            )
+            axs['y_axis'].set_yticks(tick_pos)
+            axs['y_axis'].set_yticklabels(tick_labels)
 
         else:
             axs['y_axis'].set_yticks([])
