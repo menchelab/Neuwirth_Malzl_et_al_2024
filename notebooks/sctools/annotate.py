@@ -43,3 +43,36 @@ def annotate_adata_on_gene_hi_lo(adata, gene, resolution = 5):
         resolution,
         f'{status_column}_majority_vote'
     )
+
+def get_cells_per_nhood(nhoods_graph, row_index, nhood_center_cells):
+    n_rows, n_cols = nhoods_graph.shape
+    nhood_cells = {}
+    for j, center_cell in enumerate(nhood_center_cells):
+        nhood_neighbours = nhoods_graph[:, j]
+        nhood_cells[center_cell] = row_index[
+            (nhood_neighbours == 1).toarray().flatten()
+        ]
+    
+    return nhood_cells
+
+
+def assign_to_overrepresented_nhoods(adata, fdr = 0.1):
+    cells = adata.obs.index
+    nhood_centers = adata.obs.nhood_ixs_refined == 1
+    nhood_data = adata.uns['nhood_adata'].obs.set_index('index_cell')
+    cells_per_nhood = get_cells_per_nhood(
+        adata.obsm['nhoods'],
+        cells,
+        cells[nhood_centers]
+    )
+    cells_in_overrepresented_nhoods = set()
+    for center_cell, cells_in_nhood in cells_per_nhood.items():
+        spatial_fdr = nhood_data.loc[center_cell, 'SpatialFDR']
+        log2FC = nhood_data.loc[center_cell, 'logFC']
+        if (spatial_fdr <= fdr) & (log2FC > 0):
+            cells_in_overrepresented_nhoods.update(
+                cells_in_nhood
+            )
+        
+    adata.obs['nhood_annotation'] = 'else'
+    adata.obs.loc[list(cells_in_overrepresented_nhoods), 'nhood_annotation'] = 'overrepresented'
