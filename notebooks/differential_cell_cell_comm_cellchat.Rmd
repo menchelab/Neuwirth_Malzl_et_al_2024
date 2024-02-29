@@ -1,0 +1,315 @@
+---
+title: "cell_cell_communication"
+output: html_document
+date: "2023-03-15"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# must be done prior to CellChat loading
+# otherwise will not find umap
+library(reticulate)
+reticulate::py_install(packages = 'umap-learn')
+
+library(CellChat)
+library(patchwork)
+library(dplyr)
+library(Matrix)
+options(stringsAsFactors = FALSE)
+```
+# Loading data and preparing analysis
+```{r}
+data <- readMM(
+  '../cellchat/tissue.scps.X.mtx'
+)
+data <- t(data)
+```
+```{r}
+meta <- read.table(
+  '../cellchat/tissue.scps.obs.tsv',
+  sep = '\t',
+  header = TRUE,
+  row.names = 1
+)
+meta <- meta %>% mutate(
+  disease_status = as.factor(replace(status, status != 'normal', 'disease'))
+)
+head(meta)
+```
+```{r}
+genes <- read.table(
+  '../cellchat/tissue.scps.var.tsv',
+  sep = '\t',
+  header = TRUE,
+  row.names = 1
+)
+head(genes)
+```
+```{r}
+`%nin%` = Negate(`%in%`)
+
+colnames(data) <- rownames(meta)
+rownames(data) <- rownames(genes)
+meta.list <- split(
+  meta,
+  meta$disease_status
+)
+
+# split dataset into sat1hi and sat1lo data and remove auxiliary Tregs
+disease.meta <- meta.list$disease
+disease.sat1hi.meta <- disease.meta[
+  disease.meta$cell_type %nin% c('Treg_SAT1_lo', 'Treg'),
+]
+disease.sat1hi.meta <- disease.sat1hi.meta %>% 
+  mutate(cell_type = recode(cell_type, Treg_SAT1_hi = 'Tregs'))
+
+disease.sat1lo.meta <- disease.meta[
+  disease.meta$cell_type %nin% c('Treg_SAT1_hi', 'Treg'),
+]
+disease.sat1lo.meta <- disease.sat1lo.meta %>% 
+  mutate(cell_type = recode(cell_type, Treg_SAT1_lo = 'Tregs'))
+
+meta.list <- list(
+  'sat1hi' = disease.sat1hi.meta,
+  'sat1lo' = disease.sat1lo.meta
+)
+meta.list
+```
+```{r}
+cellchats <- list(
+  "sat1hi" = createCellChat(
+    data[,rownames(meta.list$sat1hi)],
+    meta = meta.list$sat1hi,
+    group.by = "cell_type"
+  ),
+  "sat1lo" = createCellChat(
+    data[,rownames(meta.list$sat1lo)],
+    meta = meta.list$sat1lo,
+    group.by = "cell_type"
+  )
+)
+```
+```{r}
+CellChatDB <- CellChatDB.human
+showDatabaseCategory(CellChatDB)
+```
+```{r}
+set.db <- function(cellchat, db) {
+  cellchat@DB <- db
+  return(cellchat)
+}
+
+cellchats <- lapply(
+  cellchats,
+  set.db,
+  db = CellChatDB
+)
+```
+```{r}
+cellchats <- lapply(
+  cellchats,
+  subsetData
+)
+```
+```{r}
+future::plan('multisession', workers = 2)
+options(future.globals.maxSize= 1891289600)
+cellchats <- lapply(
+  cellchats,
+  identifyOverExpressedGenes
+)
+cellchats <- lapply(
+  cellchats,
+  identifyOverExpressedInteractions
+)
+```
+```{r}
+future::plan('multisession', workers = 2)
+options(future.globals.maxSize= 1891289600)
+cellchats <- lapply(
+  cellchats,
+  computeCommunProb
+)
+```
+```{r}
+cellchats <- lapply(
+  cellchats,
+  filterCommunication,
+  min.cells = 10
+)
+```
+```{r}
+cellchats <- lapply(
+  cellchats,
+  computeCommunProbPathway
+)
+```
+```{r}
+cellchats <- lapply(
+  cellchats,
+  aggregateNet
+)
+```
+```{r}
+cellchats <- lapply(
+  cellchats,
+  netAnalysis_computeCentrality
+)
+```
+```{r}
+saveRDS(cellchats, '../cellchat/tissue.scps.cellchat.diff.rds')
+```
+```{r}
+cellchats <- readRDS('../cellchat/tissue.scps.cellchat.diff.rds')
+```
+```{r}
+cellchat <- mergeCellChat(
+  cellchats, 
+  add.names = names(cellchats),
+  cell.prefix = TRUE
+)
+```
+```{r}
+netVisual_diffInteraction(
+  cellchat, 
+  weight.scale = T,
+  measure = "weight"
+)
+```
+```{r}
+netVisual_heatmap(cellchat, measure = "weight")
+```
+
+```{r}
+num.link <- sapply(cellchats, function(x) {rowSums(x@net$count) + colSums(x@net$count)-diag(x@net$count)})
+weight.MinMax <- c(min(num.link), max(num.link)) # control the dot size in the different datasets
+gg <- list()
+for (i in 1:length(cellchats)) {
+  gg[[i]] <- netAnalysis_signalingRole_scatter(
+    cellchats[[i]], 
+    title = names(cellchats)[i], 
+    weight.MinMax = weight.MinMax
+  )
+}
+gg
+```
+```{r}
+netAnalysis_signalingChanges_scatter(
+  cellchat, 
+  idents.use = "Tregs"
+)
+```
+```{r}
+netAnalysis_signalingChanges_scatter(
+  cellchat, 
+  idents.use = "Tregs",
+  signaling.exclude = c("MIF", "CD99", "VISFATIN", "MHC-II")
+)
+```
+```{r}
+cellchat <- computeNetSimilarityPairwise(cellchat, type = "functional")
+cellchat <- netEmbedding(cellchat, type = "functional")
+cellchat <- netClustering(cellchat, type = "functional")
+netVisual_embeddingPairwise(cellchat, type = "functional", label.size = 3.5)
+```
+```{r}
+cellchat <- computeNetSimilarityPairwise(cellchat, type = "structural")
+cellchat <- netEmbedding(cellchat, type = "structural")
+cellchat <- netClustering(cellchat, type = "structural")
+# Visualization in 2D-space
+netVisual_embeddingPairwise(cellchat, type = "structural", label.size = 3.5)
+```
+```{r, fig.width = 8, fig.height = 6}
+pdf(
+  '../plots/tissue.scps.ccc.fraction.diff.pdf',
+  width = 8,
+  height = 6
+)
+gg1 <- rankNet(
+  cellchat, 
+  mode = "comparison", 
+  measure = "weight", 
+  sources.use = NULL,
+  targets.use = "Tregs", 
+  stacked = T, 
+  do.stat = TRUE
+)
+gg2 <- rankNet(
+  cellchat, 
+  mode = "comparison", 
+  measure = "weight", 
+  sources.use = NULL,
+  targets.use = "Tregs", 
+  stacked = F, 
+  do.stat = TRUE
+)
+gg1 + gg2
+dev.off()
+```
+```{r, fig.width = 8, fig.height = 6}
+gg1 <- rankNet(
+  cellchat, 
+  mode = "comparison", 
+  measure = "weight", 
+  sources.use = "Tregs",
+  targets.use = NULL, 
+  stacked = T, 
+  do.stat = TRUE
+)
+gg2 <- rankNet(
+  cellchat, 
+  mode = "comparison", 
+  measure = "weight", 
+  sources.use = "Tregs",
+  targets.use = NULL, 
+  stacked = F, 
+  do.stat = TRUE
+)
+gg1 + gg2
+```
+```{r, fig.width = 14, fig.height = 6}
+gg1 <- netVisual_bubble(
+  cellchat, 
+  sources.use = NULL, 
+  targets.use = "Tregs",  
+  comparison = c(1, 2), 
+  max.dataset = 2, 
+  title.name = "Increased in-signaling in sat1hi", 
+  angle.x = 45, 
+  remove.isolate = T
+)
+gg2 <- netVisual_bubble(
+  cellchat, 
+  sources.use = NULL, 
+  targets.use = "Tregs",  
+  comparison = c(1, 2), 
+  max.dataset = 2, 
+  title.name = "Decreased in-signaling in sat1hi", 
+  angle.x = 45, 
+  remove.isolate = T
+)
+gg1 + gg2
+```
+```{r, fig.width = 14, fig.height = 6}
+gg1 <- netVisual_bubble(
+  cellchat, 
+  sources.use = "Tregs", 
+  targets.use = NULL,  
+  comparison = c(1, 2), 
+  max.dataset = 2, 
+  title.name = "Increased out-signaling in sat1hi", 
+  angle.x = 45, 
+  remove.isolate = T
+)
+gg2 <- netVisual_bubble(
+  cellchat, 
+  sources.use = "Tregs", 
+  targets.use = NULL,  
+  comparison = c(1, 2), 
+  max.dataset = 2, 
+  title.name = "Decreased out-signaling in sat1hi", 
+  angle.x = 45, 
+  remove.isolate = T
+)
+gg1 + gg2
+```
