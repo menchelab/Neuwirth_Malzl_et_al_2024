@@ -14,15 +14,15 @@ mpl.rcParams['pdf.fonttype'] = 42
 
 def plot_expression_histogram(adata, layer = 'counts', bins = 50):
     adata = adata.copy()
-
     if layer:
-        adata.X = adata.layers['counts'].copy()
-    
-    sc.pp.normalize_total(
-        adata,
-        target_sum = 1e4
-    )
-    sc.pp.log1p(adata)
+        adata.X = adata.layers[layer].copy()
+
+    if layer == 'counts':
+        sc.pp.normalize_total(
+            adata,
+            target_sum = 1e4
+        )
+        sc.pp.log1p(adata)
 
     fig, ax = plt.subplots()
     x = adata[:, 'SAT1'].X.toarray().flatten()
