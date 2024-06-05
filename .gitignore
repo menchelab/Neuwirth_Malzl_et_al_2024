@@ -3,7 +3,9 @@ plots/
 diffexp/
 cellchat/
 markers/
+fastqs/
 notebooks/.ipynb_checkpoints/
 notebooks/*/.ipynb_checkpoints/
 notebooks/sctools/__pycache__/
 notebooks/sctools/plot/__pycache__/
+cr_resources/*/*.xlsx

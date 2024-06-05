@@ -1,0 +1,3 @@
+fastqs,sample,library_type
+/scratch-cbe/users/daniel.malzl/scanalysis/ps_pbmc_data/Treg_blood_Transcriptome/,BSF_1113_Treg_blood_1,Gene Expression
+/scratch-cbe/users/daniel.malzl/scanalysis/ps_pbmc_data/Treg_blood_Antibody_Multiplex/,BSF_1113_Treg_barcode_1,Antibody Capture

@@ -1,0 +1,4 @@
+id,name,read,pattern,sequence,feature_type
+AB0251,Blood,R2,5P(BC),GTCAACTCTTTAGCG,Multiplexing Capture
+AB0254,Skin_L,R2,5P(BC),AGTAAGTTCAGCGTA,Multiplexing Capture
+AB0252,Skin_NL,R2,5P(BC),TGATGGCCTATTGGG,Multiplexing Capture

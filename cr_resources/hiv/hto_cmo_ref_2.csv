@@ -1,0 +1,3 @@
+id,name,read,pattern,sequence,feature_type
+AB0253,blood,R2,5PNNNNNNNNNN(BC),TTCCGCCTCTCTTTG,Antibody Capture
+AB0254,skin,R2,5PNNNNNNNNNN(BC),AGTAAGTTCAGCGTA,Antibody Capture

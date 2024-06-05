@@ -1,0 +1,3 @@
+fastqs,sample,library_type
+/scratch-cbe/users/daniel.malzl/scanalysis/hiv_data/SSHIV35_5_gex,SSHIV35_5_gex,Gene Expression
+/scratch-cbe/users/daniel.malzl/scanalysis/hiv_data/SSHIV35_5_mux,SSHIV35_5_mux,Antibody Capture
