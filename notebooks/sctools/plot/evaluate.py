@@ -436,6 +436,18 @@ def set_axes_extents(
     ax.set_ylim(0, ymax)
     ax.set_yticks([])
     ax.set_xticks([])
+
+
+def label_and_tick_locations(labels, labels_to_show):
+    tick_loc, corresponding_labels = [], []
+    # this needs to be enumerated in reverse since
+    # pcolormesh orients y from bottom to top
+    for i, label in zip(range(len(labels), 0, -1), labels):
+        if label in labels_to_show:
+            tick_loc.append(i - 0.5)
+            corresponding_labels.append(label)
+    
+    return tick_loc, corresponding_labels
         
         
 def grouped_heatmap(
@@ -448,6 +460,7 @@ def grouped_heatmap(
     vmin = None, 
     vmax = None, 
     show_var_labels = False, 
+    var_labels_to_show = None,
     swap_axes = False,
     figwidth = 10,
     figheight = 10
@@ -468,14 +481,16 @@ def grouped_heatmap(
         x_group_info, y_group_info = swap(x_group_info, y_group_info)
         x_groupby, y_groupby = swap(x_groupby, y_groupby)
         x_group_palettes, y_group_palettes = swap(x_group_palettes, y_group_palettes)
-        width_min = xy_grouped_data.shape[1] * 0.2 
-        width = width_min if show_var_labels and figwidth < width_min else figwidth
+        # width_min = xy_grouped_data.shape[1] * 0.2 
+        # width = width_min if show_var_labels and figwidth < width_min else figwidth
+        width = figwidth
         height = figheight
         
         
     else:
-        height_min = len(xy_grouped_data) * 0.2
-        height = height_min if show_var_labels and figheight < height_min else figheight
+        # height_min = len(xy_grouped_data) * 0.2
+        # height = height_min if show_var_labels and figheight < height_min else figheight
+        height = figheight
         width = figwidth
 
     fig, axs = setup_figure(width, height, x_groupby, y_groupby)
@@ -517,8 +532,11 @@ def grouped_heatmap(
         axs['y_axis'].set_yticks([])
     
         if show_var_labels:
-            labels = xy_grouped_data.columns
-            axs['x_axis'].set_xticks(range(len(labels)))
+            ticks, labels = label_and_tick_locations(
+                xy_grouped_data.columns,
+                set(var_labels_to_show) if var_labels_to_show else set(xy_grouped_data.columns)
+            )
+            axs['x_axis'].set_xticks(ticks)
             axs['x_axis'].set_xticklabels(labels, rotation = 90)
 
         else:
@@ -528,8 +546,11 @@ def grouped_heatmap(
         axs['x_axis'].set_xticks([])
     
         if show_var_labels:
-            labels = xy_grouped_data.index
-            axs['y_axis'].set_yticks(range(len(labels)))
+            ticks, labels = label_and_tick_locations(
+                xy_grouped_data.index,
+                set(var_labels_to_show) if var_labels_to_show else set(xy_grouped_data.index)
+            )
+            axs['y_axis'].set_yticks(ticks)
             axs['y_axis'].set_yticklabels(labels)
 
         else:
