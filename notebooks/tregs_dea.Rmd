@@ -79,6 +79,16 @@ tregs.pbmc.scps <- scanpy_export_to_seurat(
   '../diffexp/tregs.pbmc.scps.obs.tsv',
   '../diffexp/tregs.pbmc.scps.var.tsv'
 )
+tregs.tissue.sc <- scanpy_export_to_seurat(
+  '../diffexp/tregs.tissue.sarcoidosis.X.mtx',
+  '../diffexp/tregs.tissue.sarcoidosis.obs.tsv',
+  '../diffexp/tregs.tissue.sarcoidosis.var.tsv'
+)
+tregs.tissue.ps <- scanpy_export_to_seurat(
+  '../diffexp/tregs.tissue.psoriasis.X.mtx',
+  '../diffexp/tregs.tissue.psoriasis.obs.tsv',
+  '../diffexp/tregs.tissue.psoriasis.var.tsv'
+)
 ```
 
 ```{r}
@@ -110,10 +120,12 @@ Idents(tregs.tissue.scps.sat1) <- tregs.tissue.scps.sat1@meta.data$sat1_status_m
 tregs.tissue.ad <- re.ident(tregs.tissue.ad, 'status', 'normal', 'Healthy', 'Disease')
 tregs.tissue.uc <- re.ident(tregs.tissue.uc, 'status', 'control', 'Healthy', 'Disease')
 tregs.pbmc.scps <- re.ident(tregs.pbmc.scps, 'status', 'normal', 'Healthy', 'Disease')
+tregs.tissue.sc <- re.ident(tregs.tissue.sc, 'status', 'normal', 'Healthy', 'Disease')
+tregs.tissue.ps <- re.ident(tregs.tissue.ps, 'status', 'normal', 'Healthy', 'Disease')
 ```
 
 ```{r}
-compute.de.genes <- function(seurat.obj, ident.1, ident.2) {
+compute.de.genes <- function(seurat.obj, ident.1, ident.2, latent.vars = NULL) {
   # MAST requires lognorm data see https://www.bioconductor.org/packages/release/bioc/vignettes/MAST/inst/doc/MAST-interoperability.html#21_From_scater_to_MAST
   seurat.obj <- NormalizeData(
     seurat.obj,
@@ -128,7 +140,8 @@ compute.de.genes <- function(seurat.obj, ident.1, ident.2) {
     test.use = 'MAST',
     slot = "data",
     min.pct = 0.1,
-    logfc.threshold = 0
+    logfc.threshold = 0,
+    latent.vars = latent.vars
   )
   lfc.threshold <- 0.5
   pval.threshold <- 0.001
@@ -142,6 +155,8 @@ tregs.tissue.scps.sat1.de.genes <- compute.de.genes(tregs.tissue.scps.sat1, 'SAT
 tregs.tissue.ad.de.genes <- compute.de.genes(tregs.tissue.ad, 'Disease', 'Healthy')
 tregs.tissue.uc.de.genes <- compute.de.genes(tregs.tissue.uc, 'Disease', 'Healthy')
 tregs.pbmc.scps.de.genes <- compute.de.genes(tregs.pbmc.scps, 'Disease', 'Healthy')
+tregs.tissue.sc.de.genes <- compute.de.genes(tregs.tissue.sc, 'Disease', 'Healthy')
+tregs.tissue.ps.de.genes <- compute.de.genes(tregs.tissue.ps, 'Disease', 'Healthy')
 ```
 
 ```{r, fig.height = 20, fig.width = 10}
@@ -172,6 +187,8 @@ plot.volcano(tregs.tissue.scps.sat1.de.genes, 'tregs.tissue.scps.sat1')
 plot.volcano(tregs.tissue.ad.de.genes, 'tregs.tissue.ad')
 plot.volcano(tregs.tissue.uc.de.genes, 'tregs.tissue.uc')
 plot.volcano(tregs.pbmc.scps.de.genes, 'tregs.pbmc.scps')
+plot.volcano(tregs.tissue.sc.de.genes, 'tregs.tissue.sc')
+plot.volcano(tregs.tissue.ps.de.genes, 'tregs.tissue.ps')
 ```
 
 ```{r}
@@ -192,9 +209,13 @@ write.de.results(tregs.tissue.scps.sat1.de.genes, '../diffexp/tregs.tissue.scps.
 write.de.results(tregs.tissue.uc.de.genes, '../diffexp/tregs.tissue.uc.de.all.tsv', FALSE)
 write.de.results(tregs.tissue.ad.de.genes, '../diffexp/tregs.tissue.ad.de.all.tsv', FALSE)
 write.de.results(tregs.pbmc.scps.de.genes, '../diffexp/tregs.pbmc.scps.de.all.tsv', FALSE)
+write.de.results(tregs.tissue.sc.de.genes, '../diffexp/tregs.tissue.sc.de.all.tsv', FALSE)
+write.de.results(tregs.tissue.ps.de.genes, '../diffexp/tregs.tissue.ps.de.all.tsv', FALSE)
 write.de.results(tregs.tissue.scps.de.genes, '../diffexp/tregs.tissue.scps.de.signif.tsv', TRUE)
 write.de.results(tregs.tissue.scps.sat1.de.genes, '../diffexp/tregs.tissue.scps.sat1.de.signif.tsv', TRUE)
 write.de.results(tregs.tissue.uc.de.genes, '../diffexp/tregs.tissue.uc.de.signif.tsv', TRUE)
 write.de.results(tregs.tissue.ad.de.genes, '../diffexp/tregs.tissue.ad.de.signif.tsv', TRUE)
 write.de.results(tregs.pbmc.scps.de.genes, '../diffexp/tregs.pbmc.scps.de.signif.tsv', TRUE)
+write.de.results(tregs.tissue.sc.de.genes, '../diffexp/tregs.tissue.sc.de.signif.tsv', TRUE)
+write.de.results(tregs.tissue.ps.de.genes, '../diffexp/tregs.tissue.ps.de.signif.tsv', TRUE)
 ```
