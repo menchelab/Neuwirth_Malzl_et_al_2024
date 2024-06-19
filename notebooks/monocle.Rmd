@@ -65,33 +65,67 @@ plot_cells(
   label_branch_points=FALSE
 )
 ```
-```{r}
+```{r, fig.width = 8, fig.height = 5}
+pdf(
+  file = "../plots/monocle_umap_sat1status.pdf",
+  width = 7,
+  height = 5
+)
 plot_cells(
   cds,
   color_cells_by = "sat1_status_majority_vote",
   label_cell_groups=FALSE,
   label_leaves=TRUE,
-  label_branch_points=TRUE,
-  graph_label_size=1.5
+  label_branch_points = FALSE,
+  graph_label_size=3,
+  cell_size = 0.5
 )
+dev.off()
 ```
 ```{r}
 cds@principal_graph$UMAP
 ```
 ```{r}
+cell_umap_coordinates <- as.data.frame(SingleCellExperiment::reducedDims(cds)[['UMAP']])
+trajectory_node_coordinates <- as.data.frame(cds@principal_graph_aux[['UMAP']]$dp_mst)
+trajectory_node_links <- igraph::as_data_frame(cds@principal_graph[['UMAP']])
+
+write.csv(
+  cell_umap_coordinates,
+  '../monocle_results/monocle_umap.csv'
+)
+write.csv(
+  trajectory_node_coordinates,
+  '../monocle_results/monocle_trajectory_umap.csv'
+)
+write.csv(
+  trajectory_node_links,
+  '../monocle_results/monocle_trajectory_linkage.csv'
+)
+```
+```{r, fig.width = 7, fig.height = 5}
 # the root nodes need to be found by trial and error as the ones plotted above do not match the actual names of the nodes
 cds <- order_cells(
   cds,
-  root_pr_nodes = c('Y_1', 'Y_8', 'Y_21')
+  root_pr_nodes = c('Y_1', 'Y_14', 'Y_21')
 )
+
+pdf(
+  file = "../plots/monocle_umap_pseudotime.pdf",
+  width = 7,
+  height = 5
+)
+
 plot_cells(
   cds,
   color_cells_by = "pseudotime",
   label_cell_groups=FALSE,
   label_leaves=FALSE,
   label_branch_points=FALSE,
-  graph_label_size=1.5
+  graph_label_size=3,
+  cell_size = 0.5
 )
+dev.off()
 ```
 ```{r}
 pseudotime_annotation <- data.frame(pseudotime(cds))
