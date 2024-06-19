@@ -5,8 +5,8 @@ This repository contains the code for all bioinformatic analyses shown in Neuwir
 Most code is presented in the `notebooks/sctools` package and should easily be executable after installing the accompanying conda environment
 given in `environment.yml`.
 
-## Installing the environment
-To install the environment you will first need to install a variant of Anaconda. We recommend [`miniconda`](https://docs.anaconda.com/free/miniconda/) for this.
+## Installing the environments
+Installation of the prvided environments is illustrated by the scpython environment. To install an environment you will first need to install a variant of Anaconda. We recommend [`miniconda`](https://docs.anaconda.com/free/miniconda/) for this.
 After this you can simply type
 ```
 conda env create -f environment.yml
@@ -17,3 +17,5 @@ you will have to install the ipy-kernel which is done by typing
 conda activate scpython
 python -m ipykernel install --user --name scpython
 ```
+## Note on running pySCENIC
+pySCENIC seems to be ill maintained (at least when it comes to the PyPI packages). At the time of this writing both [pySCENIC](https://github.com/aertslab/pySCENIC) and the [arboreto](https://github.com/aertslab/arboreto) packages used by pySCENIC did not run when installing them from their PyPI distribution. This was due to the version not being bumped after fixing the encountered bugs which prevents the update of the PyPI packages. Therefore, I recommend to install those packages from the clones git repositories for the code to run properly.
