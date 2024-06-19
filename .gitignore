@@ -9,4 +9,5 @@ notebooks/*/.ipynb_checkpoints/
 notebooks/sctools/__pycache__/
 notebooks/sctools/plot/__pycache__/
 scenic_*/
+monocle_*/
 cr_resources/*/*.xlsx

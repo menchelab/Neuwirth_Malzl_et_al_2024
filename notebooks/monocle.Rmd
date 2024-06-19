@@ -1,0 +1,102 @@
+---
+title: "Trajectory analysis of Tregs with Monocle"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(monocle3)
+library(Matrix)
+```
+```{r}
+# analysis according to tutorial
+# see https://cole-trapnell-lab.github.io/monocle3/docs/trajectories/
+data <- readMM('../monocle_resource/tregs_disease_only.counts.mtx')
+data <- t(data)
+
+cell_metadata <- read.table(
+  '../monocle_resource/tregs_disease_only.obs.tsv',
+  sep = '\t',
+  header = TRUE,
+  row.names = 1
+)
+gene_metadata <- read.table(
+  '../monocle_resource/tregs_disease_only.var.tsv',
+  sep = '\t',
+  header = TRUE,
+  row.names = 1
+)
+gene_metadata['gene_short_name'] <- rownames(gene_metadata)
+cds <- new_cell_data_set(
+  data,
+  cell_metadata = cell_metadata,
+  gene_metadata = gene_metadata
+)
+```
+```{r}
+cds <- preprocess_cds(cds, num_dim = 50)
+cds <- align_cds(
+  cds, 
+  alignment_group = "sample_id"
+)
+```
+```{r}
+cds <- reduce_dimension(cds)
+```
+```{r}
+plot_cells(cds, label_groups_by_cluster=FALSE,  color_cells_by = "sat1_status_majority_vote")
+plot_cells(cds, genes = c('SAT1'), label_groups_by_cluster=FALSE)
+```
+```{r}
+cds <- cluster_cells(cds)
+plot_cells(cds, color_cells_by = "partition")
+```
+
+```{r}
+cds <- learn_graph(cds)
+plot_cells(
+  cds,
+  color_cells_by = "sat1_status_majority_vote",
+  label_groups_by_cluster=FALSE,
+  label_leaves=FALSE,
+  label_branch_points=FALSE
+)
+```
+```{r}
+plot_cells(
+  cds,
+  color_cells_by = "sat1_status_majority_vote",
+  label_cell_groups=FALSE,
+  label_leaves=TRUE,
+  label_branch_points=TRUE,
+  graph_label_size=1.5
+)
+```
+```{r}
+cds@principal_graph$UMAP
+```
+```{r}
+# the root nodes need to be found by trial and error as the ones plotted above do not match the actual names of the nodes
+cds <- order_cells(
+  cds,
+  root_pr_nodes = c('Y_1', 'Y_8', 'Y_21')
+)
+plot_cells(
+  cds,
+  color_cells_by = "pseudotime",
+  label_cell_groups=FALSE,
+  label_leaves=FALSE,
+  label_branch_points=FALSE,
+  graph_label_size=1.5
+)
+```
+```{r}
+pseudotime_annotation <- data.frame(pseudotime(cds))
+write.csv(
+  pseudotime_annotation,
+  '../monocle_results/pseudotime.csv'
+)
+```
