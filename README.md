@@ -3,7 +3,7 @@
 
 This repository contains the code for all bioinformatic analyses shown in Neuwirth and Malzl et al. 2024. 
 Most code is presented in the `notebooks/sctools` package and should easily be executable after installing the accompanying conda environment
-given in `environment.yml`.
+given in `envs/scpython.yml`.
 
 ## Installing the environments
 Installation of the prvided environments is illustrated by the scpython environment. To install an environment you will first need to install a variant of Anaconda. We recommend [`miniconda`](https://docs.anaconda.com/free/miniconda/) for this.
