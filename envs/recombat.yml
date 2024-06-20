@@ -1,4 +1,4 @@
-name: hgpython
+name: recombat
 channels:
   - conda-forge
   - defaults
