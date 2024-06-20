@@ -10,4 +10,5 @@ notebooks/sctools/__pycache__/
 notebooks/sctools/plot/__pycache__/
 scenic_*/
 monocle_*/
+*/.ipynb_checkpoints/
 cr_resources/*/*.xlsx
