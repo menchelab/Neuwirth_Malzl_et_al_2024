@@ -11,5 +11,7 @@ notebooks/sctools/plot/__pycache__/
 scenic_*/
 monocle_*/
 raw/
+atacseq/
+.nextflow*
 */.ipynb_checkpoints/
 cr_resources/*/*.xlsx
