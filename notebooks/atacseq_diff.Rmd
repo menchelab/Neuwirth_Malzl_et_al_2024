@@ -1,0 +1,50 @@
+# code to find differences between atac-seq libraries
+
+```{r}
+library(DESeq2)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(stringr)
+
+data <- read.csv(
+  '../atacseq/atacseq_counts.filtered.csv',
+  row.names = 1
+)
+data
+```
+```{r}
+# performing DESeq2 with and without rep1 samples because they seem to be a bit different from the rest
+coldata <- data.frame(
+  c('nt', 'nt', 'nt', 'sat1', 'sat1', 'sat1')
+)
+colnames(coldata) <- c('condition')
+rownames(coldata) <- colnames(data)
+dds <- DESeqDataSetFromMatrix(
+  countData = data,
+  colData = coldata,
+  design = ~ condition
+)
+dds$condition <- relevel(dds$condition, ref = "nt")
+dds <- DESeq(dds)
+res <- results(dds)
+res
+```
+```{r}
+# performing DESeq2 with and without rep1 samples because they seem to be a bit different from the rest
+wo_rep1 <- data[,c('treg_nt_REP2', 'treg_nt_REP3', 'treg_sat1oe_REP2', 'treg_sat1oe_REP3')]
+coldata <- data.frame(
+  c('nt', 'nt', 'sat1', 'sat1')
+)
+colnames(coldata) <- c('condition')
+rownames(coldata) <- colnames(wo_rep1)
+dds <- DESeqDataSetFromMatrix(
+  countData = wo_rep1,
+  colData = coldata,
+  design = ~ condition
+)
+dds$condition <- relevel(dds$condition, ref = "nt")
+dds <- DESeq(dds)
+res <- results(dds)
+res
+```
