@@ -1,3 +1,10 @@
+atacseq/
+cr_resources/
+monocle_resource/
+monocle_results/
+raw/
+scenic_resource/
+scenic_results/
 data/
 plots/
 diffexp/
