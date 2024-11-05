@@ -6,7 +6,7 @@ nextflow run nf-core/cutandrun \
 	-profile cbe \
 	-w /scratch-cbe/users/daniel.malzl/cpm \
 	--input resource/cnr_samples.csv \
-	--outdir results \
+	--outdir cutandrun \
 	--genome GRCh38 \
 	--peakcaller seacr,macs2 \
 	--blacklist resource/cnr_blacklist_hg38.bed \
